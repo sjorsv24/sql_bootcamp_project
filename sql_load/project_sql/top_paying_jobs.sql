@@ -35,4 +35,25 @@ LEFT JOIN skills_dim as skillsdim ON jobdim.skill_id = skillsdim.skill_id
 GROUP BY skillsdim.skills
 ORDER BY countskill DESC
 
+/* what are the most in demand
+skills for data analyst? */
 
+
+
+WITH data_analyst AS (SELECT job_id, job_title, job_location, job_schedule_type, 
+salary_year_avg, job_posted_date, job_country
+FROM job_postings_fact 
+WHERE job_title = 'Data Analyst'
+AND salary_year_avg IS NOT NULL) 
+
+SELECT skillsdim.skills, COUNT (*) AS countskill
+FROM data_analyst
+LEFT JOIN skills_job_dim as jobdim ON data_analyst.job_id = jobdim.job_id
+LEFT JOIN skills_dim as skillsdim ON jobdim.skill_id = skillsdim.skill_id
+GROUP BY skillsdim.skills
+ORDER BY countskill DESC;
+
+/* what are the top skills based on salary
+for my role? */
+
+    
