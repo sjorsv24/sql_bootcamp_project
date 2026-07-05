@@ -56,4 +56,23 @@ ORDER BY countskill DESC;
 /* what are the top skills based on salary
 for my role? */
 
-    
+WITH data_analyst AS (SELECT job_id, job_title,
+CASE 
+WHEN salary_year_avg BETWEEN 30000 AND 80000 THEN 'Laag'
+WHEN salary_year_avg BETWEEN 80000 AND 120000 THEN 'Gemiddeld' 
+WHEN salary_year_avg > 120000 THEN 'Hoog' 
+END AS salary_rank
+FROM job_postings_fact 
+WHERE job_title = 'Data Analyst'
+AND salary_year_avg IS NOT NULL)
+
+SELECT skillsdim.skills, COUNT (*) AS countskill, data_analyst.salary_rank
+FROM data_analyst
+LEFT JOIN skills_job_dim as jobdim ON data_analyst.job_id = jobdim.job_id
+LEFT JOIN skills_dim as skillsdim ON jobdim.skill_id = skillsdim.skill_id
+GROUP BY data_analyst.salary_rank, skillsdim.skills
+ORDER BY data_analyst.salary_rank, countskill DESC;
+
+/* what are the most optimal skills to learn?
+high demand and high paying */
+
