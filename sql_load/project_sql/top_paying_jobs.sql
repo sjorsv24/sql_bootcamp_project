@@ -76,18 +76,22 @@ ORDER BY data_analyst.salary_rank, countskill DESC;
 /* what are the most optimal skills to learn?
 high demand and high paying */
 
+
 WITH highpaying_jobs AS (
-SELECT job_title, COUNT (*) AS jobtitle_count, 
-ROUND (AVG(salary_year_avg), 2) AS average_salary
+SELECT job_id, job_title, salary_year_avg
 FROM job_postings_fact 
 WHERE salary_year_avg IS NOT NULL
 AND salary_year_avg > 100000
-GROUP BY job_title
-ORDER BY jobtitle_count DESC)
+)
 
-SELECT highpaying_jobs.job_title, 
-highpaying_jobs.average_salary,
-skillsdim.skills
-FROM
+SELECT 
+skillsdim.skills, count (*) as skillscount
+FROM highpaying_jobs
 LEFT JOIN skills_job_dim AS jobdim ON highpaying_jobs.job_id = jobdim.job_id
 LEFT JOIN skills_dim AS skillsdim ON jobdim.skill_id = skillsdim.skill_id
+GROUP BY skillsdim.skills
+ORDER BY count(*) DESC
+
+/* ^Deze query laat je zien welke vaardigheden (skills) het 
+meest gevraagd worden in banen die meer dan $100.000 per jaar
+ betalen, gerangschikt van de meest gevraagde naar de minst gevraagde skill. */ 
