@@ -35,6 +35,27 @@ LEFT JOIN skills_dim as skillsdim ON jobdim.skill_id = skillsdim.skill_id
 GROUP BY skillsdim.skills
 ORDER BY countskill DESC
 
+-- I remove 'anywhere' and see if we get mucht different results
+-- i also remove data analyst
+
+WITH topfifty_paid_data_jobs AS (SELECT job_id, job_title, job_location, job_schedule_type, 
+salary_year_avg, job_posted_date, job_country, dim.name
+FROM job_postings_fact AS jobfacts
+LEFT JOIN company_dim AS dim
+ON jobfacts.company_id = dim.company_id
+WHERE salary_year_avg IS NOT NULL
+ORDER BY salary_year_avg DESC
+LIMIT 50) 
+
+SELECT skillsdim.skills, COUNT (*) AS countskill
+FROM topfifty_paid_data_jobs
+LEFT JOIN skills_job_dim as jobdim ON topfifty_paid_data_jobs.job_id = jobdim.job_id
+LEFT JOIN skills_dim as skillsdim ON jobdim.skill_id = skillsdim.skill_id
+GROUP BY skillsdim.skills
+ORDER BY countskill DESC
+
+
+
 /* what are the most in demand
 skills for data analyst? */
 
@@ -95,3 +116,4 @@ ORDER BY count(*) DESC
 /* ^Deze query laat je zien welke vaardigheden (skills) het 
 meest gevraagd worden in banen die meer dan $100.000 per jaar
  betalen, gerangschikt van de meest gevraagde naar de minst gevraagde skill. */ 
+
